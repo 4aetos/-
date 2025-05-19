@@ -1,0 +1,31 @@
+[project]
+name = "code"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "4aetos",email = "55949936+4aetos@users.noreply.github.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "transformers (>=4.51.3,<5.0.0)",
+    "torch (>=2.7.0,<3.0.0)",
+    "nlpaug (>=1.1.11,<2.0.0)",
+    "nltk (>=3.9.1,<4.0.0)",
+    "tiktoken (>=0.9.0,<0.10.0)",
+    "protobuf (>=6.30.2,<7.0.0)",
+    "blobfile (>=3.0.0,<4.0.0)",
+    "sentencepiece (>=0.2.0,<0.3.0)",
+    "spacy (>=3.8.5,<4.0.0)",
+    "sentence-transformers (>=4.1.0,<5.0.0)",
+    "levenshtein (>=0.27.1,<0.28.0)",
+    "gensim (>=4.3.3,<5.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "code", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

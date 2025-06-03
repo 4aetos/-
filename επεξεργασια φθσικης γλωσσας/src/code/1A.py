@@ -21,28 +21,76 @@ nltk.download('wordnet')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+import nltk
+from nltk import CFG
 
 # Λεξικό συνωνύμων / παραφρασμένων εκφράσεων
-replacements = {
-    "dragon boat festival": "Dragon Boat Festival",
-    "in our Chinese culture": "in Chinese tradition",
-    "to celebrate it with all safe and great in our lives": "to celebrate it with safety and joy in our lives",
-    "I am very appreciated the full support of the professor": "I truly appreciate the professor's full support",
-    "for our Springer proceedings publication": "regarding the publication in the Springer proceedings"
-}
+grammar = CFG.fromstring("""
+S -> NP VP
+NP -> PN | Det N N N
+VP -> V NP
+Det -> 'our'
+PN -> 'Today'
+N -> 'dragon' | 'boat' | 'festival'
+V -> 'is'
+""")
+
+
+parser1 = nltk.ChartParser(grammar)
+
+grammar = CFG.fromstring("""
+S -> InfVP
+InfVP -> TO V NP PP
+NP -> Pro | Poss Adj N
+PP -> P NP
+TO -> 'to'
+V -> 'enjoy'|
+Pro -> 'it'
+Poss -> 'my'
+Adj -> 'deepest' |
+N -> 'wishes'
+P -> 'as'
+""")
+
+parser2 = nltk.ChartParser(grammar)
+
+
+
 
 # Συνάρτηση για ανακατασκευή
-def simple_paraphrase(text: str) -> str:
-    for phrase, replacement in replacements.items():
-        if phrase in text:
-            text = text.replace(phrase, replacement)
-    return text
+
 
 # Κείμενο εισόδου
-text1 = "Today is our dragon boat festival, in our Chinese culture, to celebrate it with all safe and great in our lives."
-text2 = "I am very appreciated the full support of the professor, for our Springer proceedings publication."
-text1_b=simple_paraphrase(text1)
-text2_b=simple_paraphrase(text2)
+text1 = "Today is our dragon boat festival"
+text2 = "to enjoy it as my deepest wishes"
+
+
+tokens1 = text1.split()
+tokens2 = text2.split()
+
+for tree in parser1.parse(tokens1):
+    tree.pretty_print()
+
+for tree in parser2.parse(tokens2):
+    tree.pretty_print()
+
+
+
+replacements = {
+    'dragon': 'legendary',
+    'festival': 'celebration',
+    'enjoy': 'have fun to',
+    'deepest' : 'dearest'
+}
+
+
+
+text1_b =  ' '.join([replacements.get(word, word) for word in text1.split()])
+
+
+text2_b = ' '.join([replacements.get(word, word) for word in text2.split()])
+
+
 
 
 # Εφαρμογή παραφραστικού αλγορίθμου
@@ -183,6 +231,14 @@ tfidf = TfidfVectorizer()
 tfidf.fit(all_texts)
 vocab = tfidf.get_feature_names_out()
 
+corpus = [preprocess(t) for t in originals + paraphrases]
+
+w2v = Word2Vec(sentences=corpus, vector_size=100, window=5, min_count=1)
+
+# Εκπαίδευση FastText
+ft = FastText(vector_size=100, window=3, min_count=1)
+ft.build_vocab(corpus)
+ft.train(corpus, total_examples=len(corpus), epochs=5)
 
 # 4. Υπολογισμός cosine similarity
 methods = {}
